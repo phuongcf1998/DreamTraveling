@@ -7,29 +7,29 @@ package phuongntd.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Date;
 import java.sql.SQLException;
 import javax.naming.NamingException;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import phuongntd.cart.CartObj;
-import phuongntd.tour.TourDAO;
-import phuongntd.tour.TourDTO;
+import phuongntd.order.OrderDAO;
+import phuongntd.user.UserDTO;
+import phuongntd.utils.DateCaculator;
+import phuongntd.utils.RandomString;
 
 /**
  *
  * @author Yun
  */
-@WebServlet(name = "AddToCartServlet", urlPatterns = {"/AddToCartServlet"})
-public class AddToCartServlet extends HttpServlet {
+public class CheckOutServlet extends HttpServlet {
 
-    private static Logger log = Logger.getLogger(AddToCartServlet.class.getName());
-    private final String HOME_MEMBER = "InitCartServlet";
+    private static Logger log = Logger.getLogger(CheckOutServlet.class.getName());
+    private final String HOME_MEMBER = "InitCart";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -43,31 +43,35 @@ public class AddToCartServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        String tourID = request.getParameter("txtTourID");
         String url = HOME_MEMBER;
+        PrintWriter out = response.getWriter();
+        String totalCost = request.getParameter("amt");
+        double totalCostParse = Double.parseDouble(totalCost);
+        Date currentDate = DateCaculator.getCurrentDate();
         try {
 
-            HttpSession session = request.getSession();
-            CartObj cart = (CartObj) session.getAttribute("CART");
-            if (cart == null) {
-                cart = new CartObj();
-            }
-            TourDAO dao = new TourDAO();
-            TourDTO dto = dao.getTourByID(tourID);
-            cart.addItemToCart(dto);
+            HttpSession session = request.getSession(false);
+            if (session != null) {
 
-            session.setAttribute("CART", cart);
+                CartObj cart = (CartObj) session.getAttribute("CART");
+                if (cart != null) {
+                    UserDTO user = (UserDTO) session.getAttribute("MEMBER");
+                    String userID = user.getUserID();
+                    OrderDAO dao = new OrderDAO();
+                    String orderID = RandomString.generateRandomString(6);
+                    boolean saveOrderResult = dao.checkOutOrder(orderID, userID, totalCostParse, currentDate);
+                }
+
+            }
 
         } catch (NamingException ex) {
-            log.error("AddToCartServlet_NamingException " + ex.getMessage());
+            log.error("CheckOutServlet_NamingException " + ex.getMessage());
 
         } catch (SQLException ex) {
-            log.error("AddToCartServlet_SQLException " + ex.getMessage());
+            log.error("CheckOutServlet_SQLException " + ex.getMessage());
         } finally {
 
-            RequestDispatcher rd = request.getRequestDispatcher(url);
-            rd.forward(request, response);
+            response.sendRedirect(url);
             out.close();
         }
     }

@@ -5,31 +5,24 @@
  */
 package phuongntd.servlet;
 
+import com.restfb.types.User;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
-import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.apache.log4j.Logger;
-import phuongntd.cart.CartObj;
-import phuongntd.tour.TourDAO;
-import phuongntd.tour.TourDTO;
+import phuongntd.utils.RestFB;
 
 /**
  *
  * @author Yun
  */
-@WebServlet(name = "AddToCartServlet", urlPatterns = {"/AddToCartServlet"})
-public class AddToCartServlet extends HttpServlet {
+public class LoginWithFaceBookServlet extends HttpServlet {
 
-    private static Logger log = Logger.getLogger(AddToCartServlet.class.getName());
-    private final String HOME_MEMBER = "InitCartServlet";
+    private final String HOME_MEMBER = "InitCart";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -44,28 +37,21 @@ public class AddToCartServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String tourID = request.getParameter("txtTourID");
         String url = HOME_MEMBER;
         try {
+            String code = request.getParameter("code");
 
-            HttpSession session = request.getSession();
-            CartObj cart = (CartObj) session.getAttribute("CART");
-            if (cart == null) {
-                cart = new CartObj();
+            if (code == null || code.isEmpty()) {
+
+            } else {
+                String accessToken = RestFB.getToken(code);
+                User user = RestFB.getUserInfo(accessToken);
+                HttpSession session = request.getSession();
+                session.setAttribute("USER_FB_ID", user.getId());
+                session.setAttribute("USER_FB_NAME", user.getName());
             }
-            TourDAO dao = new TourDAO();
-            TourDTO dto = dao.getTourByID(tourID);
-            cart.addItemToCart(dto);
 
-            session.setAttribute("CART", cart);
-
-        } catch (NamingException ex) {
-            log.error("AddToCartServlet_NamingException " + ex.getMessage());
-
-        } catch (SQLException ex) {
-            log.error("AddToCartServlet_SQLException " + ex.getMessage());
         } finally {
-
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);
             out.close();

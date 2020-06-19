@@ -36,6 +36,18 @@
         <servlet-name>GetDiscountServlet</servlet-name>
         <servlet-class>phuongntd.servlet.GetDiscountServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>SearchServlet</servlet-name>
+        <servlet-class>phuongntd.servlet.SearchServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LoginWithFaceBookServlet</servlet-name>
+        <servlet-class>phuongntd.servlet.LoginWithFaceBookServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CheckOutServlet</servlet-name>
+        <servlet-class>phuongntd.servlet.CheckOutServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
@@ -64,6 +76,22 @@
         <servlet-name>GetDiscountServlet</servlet-name>
         <url-pattern>/GetDiscountServlet</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SearchServlet</servlet-name>
+        <url-pattern>/SearchServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginWithFaceBookServlet</servlet-name>
+        <url-pattern>/LoginWithFaceBookServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CheckOutServlet</servlet-name>
+        <url-pattern>/CheckOutServlet</url-pattern>
+    </servlet-mapping>
+      <context-param>
+        <param-name>returnurl</param-name>
+        <param-value>http://localhost:8084/TravelingSite/checkOut</param-value>
+    </context-param>
     <session-config>
         <session-timeout>
             30

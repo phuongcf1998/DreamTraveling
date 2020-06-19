@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 /**
@@ -104,6 +105,7 @@ public class FilterDispatcher implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
         request.setCharacterEncoding("UTF-8");
         String uri = req.getRequestURI();
         String url = HOME_PAGE;
@@ -113,21 +115,24 @@ public class FilterDispatcher implements Filter {
             String resource = uri.substring(lastIndex + 1);
 
             if (resource.length() > 0) {
-               
-                    url = resource.substring(0, 1).toUpperCase()
-                            + resource.substring(1)
-                            + "Servlet";
-                    if (resource.lastIndexOf(".html") > 0 || resource.lastIndexOf(".jsp") > 0) {
-                        url = resource;
-                    }
-                
+
+                url = resource.substring(0, 1).toUpperCase()
+                        + resource.substring(1)
+                        + "Servlet";
+                if (resource.lastIndexOf(".html") > 0 || resource.lastIndexOf(".jsp") > 0 || resource.lastIndexOf(".css") > 0
+                        || resource.lastIndexOf(".js") > 0 || resource.lastIndexOf(".png") > 0) {
+                    url = resource;
+                }
 
             }
 
             if (url != null) {
+
                 RequestDispatcher rd = req.getRequestDispatcher(url);
                 rd.forward(request, response);
+
             } else {
+
                 chain.doFilter(request, response);
             }
 

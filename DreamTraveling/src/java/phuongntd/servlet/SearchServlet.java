@@ -7,29 +7,28 @@ package phuongntd.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.util.List;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
-import phuongntd.cart.CartObj;
 import phuongntd.tour.TourDAO;
 import phuongntd.tour.TourDTO;
+import phuongntd.utils.CheckNumber;
 
 /**
  *
  * @author Yun
  */
-@WebServlet(name = "AddToCartServlet", urlPatterns = {"/AddToCartServlet"})
-public class AddToCartServlet extends HttpServlet {
+public class SearchServlet extends HttpServlet {
 
-    private static Logger log = Logger.getLogger(AddToCartServlet.class.getName());
-    private final String HOME_MEMBER = "InitCartServlet";
+    private static Logger log = Logger.getLogger(SearchServlet.class.getName());
+    private final String HOME_PAGE = "home.jsp";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -43,32 +42,67 @@ public class AddToCartServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+
         PrintWriter out = response.getWriter();
-        String tourID = request.getParameter("txtTourID");
-        String url = HOME_MEMBER;
+        String fromPlace = request.getParameter("txtFromPlace");
+        String toPlace = request.getParameter("txtToPlace");
+        String fromDate = request.getParameter("txtFromDate");
+        Date fromDateParse = Date.valueOf(fromDate);
+        String toDate = request.getParameter("txtToDate");
+        Date toDateParse = Date.valueOf(toDate);
+        String price = request.getParameter("price");
+        int pageIndex = 1;
+        if (request.getParameter("page") != null) {
+            pageIndex = Integer.parseInt(request.getParameter("page"));
+        }
+        int pageSize = 5;
+        int endPage = 0;
+        String url = HOME_PAGE;
+
         try {
+            if (!price.equals("") && CheckNumber.isNumeric(price)) {
+                double priceParse = Double.parseDouble(price);
+                TourDAO dao = new TourDAO();
+                int countListTour = dao.countTourHavePriceValue(fromDateParse, toDateParse, fromPlace, toPlace, priceParse);
 
-            HttpSession session = request.getSession();
-            CartObj cart = (CartObj) session.getAttribute("CART");
-            if (cart == null) {
-                cart = new CartObj();
+                endPage = countListTour / pageSize;
+
+                if (countListTour % pageSize != 0) {
+                    endPage++;
+                }
+                dao.searchTourHavePriceValue(fromDateParse, toDateParse, fromPlace, toPlace, priceParse, pageIndex, pageSize);
+                List<TourDTO> listTour = dao.getListTour();
+                request.setAttribute("SEARCH_RESULT", listTour);
+                request.setAttribute("TOTAL_PAGE", endPage);
+            } else if (price.equals("")) {
+
+                TourDAO dao = new TourDAO();
+                int countListTour = dao.countTourWithoutPriceValue(fromDateParse, toDateParse, fromPlace, toPlace);
+
+                endPage = countListTour / pageSize;
+
+                if (countListTour % pageSize != 0) {
+                    endPage++;
+                }
+                dao.searchTourWithoutPriceValue(fromDateParse, toDateParse, fromPlace, toPlace, pageIndex, pageSize);
+                List<TourDTO> listTour = dao.getListTour();
+                request.setAttribute("SEARCH_RESULT", listTour);
+                request.setAttribute("TOTAL_PAGE", endPage);
+            } else {
+                request.setAttribute("SEARCH_RESULT", "");
+                request.setAttribute("TOTAL_PAGE", 0);
             }
-            TourDAO dao = new TourDAO();
-            TourDTO dto = dao.getTourByID(tourID);
-            cart.addItemToCart(dto);
-
-            session.setAttribute("CART", cart);
 
         } catch (NamingException ex) {
-            log.error("AddToCartServlet_NamingException " + ex.getMessage());
+            log.error("SearchServlet_NamingException " + ex.getMessage());
 
         } catch (SQLException ex) {
-            log.error("AddToCartServlet_SQLException " + ex.getMessage());
+            log.error("SearchServlet_SQLException " + ex.getMessage());
         } finally {
-
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);
             out.close();
+
         }
     }
 

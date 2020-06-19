@@ -164,4 +164,205 @@ public class TourDAO implements Serializable {
 
     }
 
+    public void searchTourHavePriceValue(Date fromDate, Date toDate, String fromPlace, String toPlace, double price, int pageIndex, int PageSize)
+            throws NamingException, SQLException {
+
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        try {
+            conn = DBUtils.makeConnection();
+            if (conn != null) {
+                String sql = "SELECT tourID,tourName,fromDate,toDate,price"
+                        + ",quota,image,fromPlace,"
+                        + "toPlace,dateImport,status "
+                        + "FROM tbl_Tour WHERE "
+                        + "fromPlace like ? and toPlace like ? and fromDate >= ? and toDate <= ?  and price = ? "
+                        + "ORDER BY dateImport "
+                        + "OFFSET ? ROWS "
+                        + "FETCH NEXT ? "
+                        + "ROW ONLY";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, "%" + fromPlace + "%");
+                stm.setString(2, "%" + toPlace + "%");
+                stm.setDate(3, fromDate);
+                stm.setDate(4, toDate);
+                stm.setDouble(5, price);
+                stm.setInt(6, (pageIndex - 1) * PageSize);
+                stm.setInt(7, PageSize);
+                rs = stm.executeQuery();
+                while (rs.next()) {
+                    if (listTour == null) {
+                        listTour = new ArrayList<>();
+                    }
+                    String tourID = rs.getString("tourID");
+                    String tourName = rs.getString("tourName");
+                    Date fromDateResult = rs.getDate("fromDate");
+                    Date toDateResult = rs.getDate("toDate");
+                    int quota = rs.getInt("quota");
+                    String image = rs.getString("image");
+                    String fromPlaceResult = rs.getString("fromPlace");
+                    String toPlaceResult = rs.getString("toPlace");
+                    Date dateImport = rs.getDate("dateImport");
+                    int status = rs.getInt("status");
+                    TourDTO dto = new TourDTO(tourID, tourName, fromDateResult, toDateResult, price, quota, image, fromPlaceResult, toPlaceResult, dateImport, status);
+                    listTour.add(dto);
+
+                }
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (stm != null) {
+                stm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+
+    }
+
+    public void searchTourWithoutPriceValue(Date fromDate, Date toDate, String fromPlace, String toPlace, int pageIndex, int PageSize)
+            throws NamingException, SQLException {
+
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        try {
+            conn = DBUtils.makeConnection();
+            if (conn != null) {
+                String sql = "SELECT tourID,tourName,fromDate,toDate,price"
+                        + ",quota,image,fromPlace,"
+                        + "toPlace,dateImport,status "
+                        + "FROM tbl_Tour WHERE "
+                        + "fromPlace like ? and toPlace like ? and fromDate >= ? and toDate <= ? "
+                        + "ORDER BY dateImport "
+                        + "OFFSET ? ROWS "
+                        + "FETCH NEXT ? "
+                        + "ROW ONLY";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, "%" + fromPlace + "%");
+                stm.setString(2, "%" + toPlace + "%");
+                stm.setDate(3, fromDate);
+                stm.setDate(4, toDate);
+                stm.setInt(5, (pageIndex - 1) * PageSize);
+                stm.setInt(6, PageSize);
+                rs = stm.executeQuery();
+                while (rs.next()) {
+                    if (listTour == null) {
+                        listTour = new ArrayList<>();
+                    }
+                    String tourID = rs.getString("tourID");
+                    String tourName = rs.getString("tourName");
+                    Date fromDateResult = rs.getDate("fromDate");
+                    Date toDateResult = rs.getDate("toDate");
+                    int quota = rs.getInt("quota");
+                    double price = rs.getDouble("price");
+                    String image = rs.getString("image");
+                    String fromPlaceResult = rs.getString("fromPlace");
+                    String toPlaceResult = rs.getString("toPlace");
+                    Date dateImport = rs.getDate("dateImport");
+                    int status = rs.getInt("status");
+                    TourDTO dto = new TourDTO(tourID, tourName, fromDateResult, toDateResult, price, quota, image, fromPlaceResult, toPlaceResult, dateImport, status);
+                    listTour.add(dto);
+
+                }
+
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (stm != null) {
+                stm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+
+    }
+
+    public int countTourHavePriceValue(Date fromDate, Date toDate, String fromPlace, String toPlace, double price) throws NamingException, SQLException {
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBUtils.makeConnection();
+
+            if (conn != null) {
+                String sql = "SELECT COUNT(tourID) FROM tbl_Tour WHERE "
+                        + "fromPlace like ? and toPlace like ? and fromDate >= ? and toDate <= ? and price = ? ";
+
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, "%" + fromPlace + "%");
+                stm.setString(2, "%" + toPlace + "%");
+                stm.setDate(3, fromDate);
+                stm.setDate(4, toDate);
+                stm.setDouble(5, price);
+
+                rs = stm.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1);
+
+                }
+            }
+
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (stm != null) {
+                stm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return 0;
+
+    }
+
+    public int countTourWithoutPriceValue(Date fromDate, Date toDate, String fromPlace, String toPlace) throws NamingException, SQLException {
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBUtils.makeConnection();
+
+            if (conn != null) {
+                String sql = "SELECT COUNT(tourID) FROM tbl_Tour WHERE "
+                        + "fromPlace like ? and toPlace like ? and fromDate >= ? and toDate <= ?";
+
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, "%" + fromPlace + "%");
+                stm.setString(2, "%" + toPlace + "%");
+                stm.setDate(3, fromDate);
+                stm.setDate(4, toDate);
+
+                rs = stm.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1);
+
+                }
+            }
+
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (stm != null) {
+                stm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return 0;
+
+    }
 }

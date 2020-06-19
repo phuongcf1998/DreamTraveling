@@ -5,6 +5,7 @@
  */
 package phuongntd.servlet;
 
+import com.restfb.types.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -15,9 +16,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import phuongntd.tour.TourDAO;
 import phuongntd.tour.TourDTO;
+import phuongntd.utils.RestFB;
 
 /**
  *
@@ -43,6 +46,7 @@ public class InitCartServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         String url = HOME_MEMBER;
         try {
+
             TourDAO dao = new TourDAO();
             dao.getAllTour();
             List<TourDTO> listTour = dao.getListTour();

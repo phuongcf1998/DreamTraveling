@@ -16,6 +16,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
@@ -24,6 +25,9 @@ import org.apache.log4j.Logger;
  *
  * @author Yun
  */
+@MultipartConfig(fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 1024 * 1024 * 5,
+        maxRequestSize = 1024 * 1024 * 5 * 5)
 public class FilterDispatcher implements Filter {
 
     private static final boolean debug = true;
@@ -105,7 +109,7 @@ public class FilterDispatcher implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
+
         request.setCharacterEncoding("UTF-8");
         String uri = req.getRequestURI();
         String url = HOME_PAGE;
@@ -120,7 +124,7 @@ public class FilterDispatcher implements Filter {
                         + resource.substring(1)
                         + "Servlet";
                 if (resource.lastIndexOf(".html") > 0 || resource.lastIndexOf(".jsp") > 0 || resource.lastIndexOf(".css") > 0
-                        || resource.lastIndexOf(".js") > 0 || resource.lastIndexOf(".png") > 0) {
+                        || resource.lastIndexOf(".js") > 0 || resource.lastIndexOf(".png") > 0 || resource.lastIndexOf(".jpg") > 0) {
                     url = resource;
                 }
 

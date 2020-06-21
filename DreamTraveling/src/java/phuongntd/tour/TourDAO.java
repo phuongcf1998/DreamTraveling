@@ -30,7 +30,7 @@ public class TourDAO implements Serializable {
     }
 
     public boolean createTour(String tourID, String tourName,
-            Date fromDate, Date toDate, double price, int quota, String image, String fromPlace, String toPlace)
+            Date fromDate, Date toDate, double price, int quota, String imageName, String path, String fromPlace, String toPlace)
             throws SQLException, NamingException {
 
         Connection conn = null;
@@ -40,8 +40,8 @@ public class TourDAO implements Serializable {
         try {
             conn = DBUtils.makeConnection();
             if (conn != null) {
-                String sql = "Insert into tbl_Tour(tourID,tourName,fromDate,toDate,price,quota,image,fromPlace,toPlace,dateImport,status)"
-                        + "values(?,?,?,?,?,?,?,?,?,?,?)";
+                String sql = "Insert into tbl_Tour(tourID,tourName,fromDate,toDate,price,quota,imageName,path,fromPlace,toPlace,dateImport,status)"
+                        + "values(?,?,?,?,?,?,?,?,?,?,?,?)";
                 stm = conn.prepareStatement(sql);
                 stm.setString(1, tourID);
                 stm.setString(2, tourName);
@@ -49,11 +49,12 @@ public class TourDAO implements Serializable {
                 stm.setDate(4, toDate);
                 stm.setDouble(5, price);
                 stm.setInt(6, quota);
-                stm.setString(7, image);
-                stm.setString(8, fromPlace);
-                stm.setString(9, toPlace);
-                stm.setDate(10, date);
-                stm.setInt(11, 1);
+                stm.setString(7, imageName);
+                stm.setString(8, path);
+                stm.setString(9, fromPlace);
+                stm.setString(10, toPlace);
+                stm.setDate(11, date);
+                stm.setInt(12, 1);
 
                 int row = stm.executeUpdate();
                 if (row > 0) {
@@ -83,7 +84,7 @@ public class TourDAO implements Serializable {
             conn = DBUtils.makeConnection();
             if (conn != null) {
                 String sql = "Select tourID,tourName,fromDate,toDate,price,"
-                        + "quota,image,fromPlace,toPlace,dateImport,status from tbl_Tour";
+                        + "quota,imageName,path,fromPlace,toPlace,dateImport,status from tbl_Tour";
                 stm = conn.prepareStatement(sql);
                 rs = stm.executeQuery();
                 while (rs.next()) {
@@ -96,12 +97,13 @@ public class TourDAO implements Serializable {
                     Date toDate = rs.getDate("toDate");
                     double price = rs.getDouble("price");
                     int quota = rs.getInt("quota");
-                    String image = rs.getString("image");
+                    String imageName = rs.getString("imageName");
+                    String path = rs.getString("path");
                     String fromPlace = rs.getString("fromPlace");
                     String toPlace = rs.getString("toPlace");
                     Date dateImport = rs.getDate("dateImport");
                     int status = rs.getInt("status");
-                    TourDTO dto = new TourDTO(tourID, tourName, fromDate, toDate, price, quota, image, fromPlace, toPlace, dateImport, status);
+                    TourDTO dto = new TourDTO(tourID, tourName, fromDate, toDate, price, quota, imageName, path, fromPlace, toPlace, dateImport, status);
                     listTour.add(dto);
 
                 }
@@ -129,7 +131,7 @@ public class TourDAO implements Serializable {
             conn = DBUtils.makeConnection();
             if (conn != null) {
                 String sql = "Select tourName,fromDate,toDate,price,"
-                        + "quota,image,fromPlace,toPlace,dateImport,status from tbl_Tour where tourID = ? ";
+                        + "quota,imageName,path,fromPlace,toPlace,dateImport,status from tbl_Tour where tourID = ? ";
                 stm = conn.prepareStatement(sql);
                 stm.setString(1, tourID);
                 rs = stm.executeQuery();
@@ -139,12 +141,13 @@ public class TourDAO implements Serializable {
                     Date toDate = rs.getDate("toDate");
                     double price = rs.getDouble("price");
                     int quota = rs.getInt("quota");
-                    String image = rs.getString("image");
+                    String imageName = rs.getString("imageName");
+                    String path = rs.getString("path");
                     String fromPlace = rs.getString("fromPlace");
                     String toPlace = rs.getString("toPlace");
                     Date dateImport = rs.getDate("dateImport");
                     int status = rs.getInt("status");
-                    TourDTO dto = new TourDTO(tourID, tourName, fromDate, toDate, price, quota, image, fromPlace, toPlace, dateImport, status);
+                    TourDTO dto = new TourDTO(tourID, tourName, fromDate, toDate, price, quota, imageName, path, fromPlace, toPlace, dateImport, status);
                     result = dto;
                 }
             }
@@ -174,7 +177,7 @@ public class TourDAO implements Serializable {
             conn = DBUtils.makeConnection();
             if (conn != null) {
                 String sql = "SELECT tourID,tourName,fromDate,toDate,price"
-                        + ",quota,image,fromPlace,"
+                        + ",quota,imageName,path,fromPlace,"
                         + "toPlace,dateImport,status "
                         + "FROM tbl_Tour WHERE "
                         + "fromPlace like ? and toPlace like ? and fromDate >= ? and toDate <= ?  and price = ? "
@@ -200,12 +203,13 @@ public class TourDAO implements Serializable {
                     Date fromDateResult = rs.getDate("fromDate");
                     Date toDateResult = rs.getDate("toDate");
                     int quota = rs.getInt("quota");
-                    String image = rs.getString("image");
+                    String imageName = rs.getString("imageName");
+                    String path = rs.getString("path");
                     String fromPlaceResult = rs.getString("fromPlace");
                     String toPlaceResult = rs.getString("toPlace");
                     Date dateImport = rs.getDate("dateImport");
                     int status = rs.getInt("status");
-                    TourDTO dto = new TourDTO(tourID, tourName, fromDateResult, toDateResult, price, quota, image, fromPlaceResult, toPlaceResult, dateImport, status);
+                    TourDTO dto = new TourDTO(tourID, tourName, fromDateResult, toDateResult, price, quota, imageName, path, fromPlaceResult, toPlaceResult, dateImport, status);
                     listTour.add(dto);
 
                 }
@@ -234,7 +238,7 @@ public class TourDAO implements Serializable {
             conn = DBUtils.makeConnection();
             if (conn != null) {
                 String sql = "SELECT tourID,tourName,fromDate,toDate,price"
-                        + ",quota,image,fromPlace,"
+                        + ",quota,imageName,path,fromPlace,"
                         + "toPlace,dateImport,status "
                         + "FROM tbl_Tour WHERE "
                         + "fromPlace like ? and toPlace like ? and fromDate >= ? and toDate <= ? "
@@ -260,12 +264,13 @@ public class TourDAO implements Serializable {
                     Date toDateResult = rs.getDate("toDate");
                     int quota = rs.getInt("quota");
                     double price = rs.getDouble("price");
-                    String image = rs.getString("image");
+                    String imageName = rs.getString("imageName");
+                    String path = rs.getString("path");
                     String fromPlaceResult = rs.getString("fromPlace");
                     String toPlaceResult = rs.getString("toPlace");
                     Date dateImport = rs.getDate("dateImport");
                     int status = rs.getInt("status");
-                    TourDTO dto = new TourDTO(tourID, tourName, fromDateResult, toDateResult, price, quota, image, fromPlaceResult, toPlaceResult, dateImport, status);
+                    TourDTO dto = new TourDTO(tourID, tourName, fromDateResult, toDateResult, price, quota, imageName, path, fromPlaceResult, toPlaceResult, dateImport, status);
                     listTour.add(dto);
 
                 }
@@ -364,5 +369,42 @@ public class TourDAO implements Serializable {
         }
         return 0;
 
+    }
+
+    public int getTotalQuotaInTour(String tourID) throws SQLException, NamingException {
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+
+        int result = 0;
+
+        try {
+            conn = DBUtils.makeConnection();
+            if (conn != null) {
+                String sql = "SELECT quota FROM tbl_Tour WHERE tourID =?";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, tourID);
+                rs = stm.executeQuery();
+                if (rs.next()) {
+                    result = rs.getInt(1);
+                }
+
+            }
+
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+
+            if (stm != null) {
+                stm.close();
+            }
+
+            if (conn != null) {
+                conn.close();
+            }
+        }
+
+        return result;
     }
 }

@@ -15,7 +15,7 @@ public class FaceBookConstant implements Serializable{
 
     public static String FACEBOOK_APP_ID = "3149141171843956";
     public static String FACEBOOK_APP_SECRET = "73535fa99ff74a7a969e595974a1aa5d";
-    public static String FACEBOOK_REDIRECT_URL = "http://localhost:8084/TravelingSite/LoginWithFaceBook";
+    public static String FACEBOOK_REDIRECT_URL = "http://localhost:8084/TravelingSite/loginWithFaceBook";
     public static String FACEBOOK_LINK_GET_TOKEN = "https://graph.facebook.com/oauth/access_token?client_id=%s&client_secret=%s&redirect_uri=%s&code=%s";
 
 }

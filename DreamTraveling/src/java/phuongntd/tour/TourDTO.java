@@ -20,7 +20,8 @@ public class TourDTO implements Serializable {
     private Date toDate;
     private double price;
     private int quota;
-    private String image;
+    private String imageName;
+    private String path;
     private String fromPlace;
     private String toPlace;
     private Date dateImport;
@@ -29,14 +30,15 @@ public class TourDTO implements Serializable {
     public TourDTO() {
     }
 
-    public TourDTO(String tourID, String tourName, Date fromDate, Date toDate, double price, int quota, String image, String fromPlace, String toPlace, Date dateImport, int status) {
+    public TourDTO(String tourID, String tourName, Date fromDate, Date toDate, double price, int quota, String imageName, String path, String fromPlace, String toPlace, Date dateImport, int status) {
         this.tourID = tourID;
         this.tourName = tourName;
         this.fromDate = fromDate;
         this.toDate = toDate;
         this.price = price;
         this.quota = quota;
-        this.image = image;
+        this.imageName = imageName;
+        this.path = path;
         this.fromPlace = fromPlace;
         this.toPlace = toPlace;
         this.dateImport = dateImport;
@@ -128,17 +130,31 @@ public class TourDTO implements Serializable {
     }
 
     /**
-     * @return the image
+     * @return the imageName
      */
-    public String getImage() {
-        return image;
+    public String getImageName() {
+        return imageName;
     }
 
     /**
-     * @param image the image to set
+     * @param imageName the imageName to set
      */
-    public void setImage(String image) {
-        this.image = image;
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
+
+    /**
+     * @return the path
+     */
+    public String getPath() {
+        return path;
+    }
+
+    /**
+     * @param path the path to set
+     */
+    public void setPath(String path) {
+        this.path = path;
     }
 
     /**

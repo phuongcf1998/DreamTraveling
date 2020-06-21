@@ -88,7 +88,7 @@
         <servlet-name>CheckOutServlet</servlet-name>
         <url-pattern>/CheckOutServlet</url-pattern>
     </servlet-mapping>
-      <context-param>
+    <context-param>
         <param-name>returnurl</param-name>
         <param-value>http://localhost:8084/TravelingSite/checkOut</param-value>
     </context-param>

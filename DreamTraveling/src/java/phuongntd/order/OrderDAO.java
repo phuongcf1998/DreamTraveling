@@ -10,9 +10,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Map;
 import javax.naming.NamingException;
-import phuongntd.tour.TourDTO;
 import phuongntd.utils.DBUtils;
 
 /**
@@ -55,5 +53,6 @@ public class OrderDAO implements Serializable {
         return result;
 
     }
+    
 
 }

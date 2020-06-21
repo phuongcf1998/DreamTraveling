@@ -5,7 +5,6 @@
  */
 package phuongntd.servlet;
 
-import com.restfb.types.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -16,11 +15,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import phuongntd.tour.TourDAO;
 import phuongntd.tour.TourDTO;
-import phuongntd.utils.RestFB;
 
 /**
  *
@@ -29,7 +26,7 @@ import phuongntd.utils.RestFB;
 public class InitCartServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(InitCartServlet.class.getName());
-    private final String HOME_MEMBER = "member.jsp";
+    private final String BOOK_PAGE = "book_tour.jsp";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -44,7 +41,7 @@ public class InitCartServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String url = HOME_MEMBER;
+        String url = BOOK_PAGE;
         try {
 
             TourDAO dao = new TourDAO();

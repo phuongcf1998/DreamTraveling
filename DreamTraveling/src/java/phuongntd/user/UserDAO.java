@@ -30,7 +30,7 @@ public class UserDAO implements Serializable {
             conn = DBUtils.makeConnection();
 
             if (conn != null) {
-                String sql = "Select userID , password , fullName , role from tbl_User where userID = ? and password = ? ";
+                String sql = "Select userID , password , fullName , role , status from tbl_User where userID = ? and password = ? ";
                 stm = conn.prepareStatement(sql);
                 stm.setString(1, username);
                 stm.setString(2, password);
@@ -39,7 +39,8 @@ public class UserDAO implements Serializable {
                     String userID = rs.getString("userID");
                     String fullName = rs.getString("fullName");
                     int role = rs.getInt("role");
-                    user = new UserDTO(userID, password, fullName, role);
+                    int status = rs.getInt("status");
+                    user = new UserDTO(userID, password, fullName, role, status);
 
                 }
 
@@ -61,6 +62,90 @@ public class UserDAO implements Serializable {
         }
 
         return user;
+
+    }
+
+    public boolean insertUserFaceBookWhenLogin(UserDTO dto) throws NamingException, SQLException {
+
+        boolean result = false;
+
+        Connection conn = null;
+        PreparedStatement stm = null;
+
+        try {
+            conn = DBUtils.makeConnection();
+
+            if (conn != null) {
+                String sql = "Insert into tbl_User(userID,password,fullName,role,status) values(?,?,?,?,?)";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, dto.getUserID());
+                stm.setString(2, dto.getPassword());
+                stm.setString(3, dto.getFullName());
+                stm.setInt(4, dto.getRole());
+                stm.setInt(5, dto.getStatus());
+
+                int row = stm.executeUpdate();
+                if (row > 0) {
+                    result = true;
+
+                }
+
+            }
+
+        } finally {
+
+            if (stm != null) {
+                stm.close();
+            }
+
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+
+        return result;
+
+    }
+
+    public boolean checkUserFacebookIsExist(String userID) throws SQLException, NamingException {
+        boolean result = false;
+
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBUtils.makeConnection();
+
+            if (conn != null) {
+                String sql = "Select password , fullName , role , status from tbl_User where userID = ?";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, userID);
+                rs = stm.executeQuery();
+                if (rs.next()) {
+                    result = true;
+
+                }
+
+            }
+
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+
+            if (stm != null) {
+                stm.close();
+            }
+
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+
+        return result;
 
     }
 

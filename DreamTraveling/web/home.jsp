@@ -23,22 +23,12 @@
             }
         </style>
 
-        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-        <script>
-            $(function () {
-                $(".datepicker").datepicker();
-            });
-        </script>
+
     </head>
     <body>
         <c:set var="seachResult" value="${requestScope.SEARCH_RESULT}" />
         <c:set var="totalPage" value="${requestScope.TOTAL_PAGE}" />
-        <c:set var="txtFromPlace" value="${param.txtFromPlace}" />
-        <c:set var="txtToPlace" value="${param.txtToPlace}" />
-        <c:set var="txtFromDate" value="${param.txtFromDate}" />
-        <c:set var="txtToDate" value="${param.txtToDate}" />
-        <c:set var="price" value="${param.price}" />
+
         <h1>Search Tour </h1>
 
         <form action="search">
@@ -47,32 +37,23 @@
             <label for="txtToPlace">To Place:</label>
             <input type="text"  name="txtToPlace"  value="${param.txtToPlace}">
             <label for="txtFromDate">From Date:</label>
-            <input type="date"  name="txtFromDate" required pattern="\d{4}-\d{2}-\d{2}" value="${param.txtFromDate}">
+            <input type="date" id="txtFromDate" name="txtFromDate" required value="${param.txtFromDate}">
             <label for="txtToDate">To Date:</label>
-            <input type="date"  name="txtToDate" required pattern="\d{4}-\d{2}-\d{2}" value="${param.txtToDate}">
+            <input type="date"  name="txtToDate" required  value="${param.txtToDate}">
             <label for="price">Price</label>
             <input type="text"  name="price" value="${param.price}">
+            <input type="hidden" name="urlForward" value="Search_Home"/>
             <input type="submit" value="Search" />
         </form> <br/><br/>
 
 
-        <a href="login.html">Click here to login</a>
+        <a href="login.html">Click here to login</a> <br/><br/><br/>
 
 
-        <div class="center">
-            <c:forEach begin="1" end="${totalPage}" var="i">
-                <c:url var="currentPageLink" value="search">
 
-                    <c:param name="page" value="${i}" />
-
-                </c:url>
-                <a id="${i}"  style="margin: 5px" href="${currentPageLink}">${i}</a>
-            </c:forEach>
-
-        </div>
         <c:if test="${not empty seachResult}">
-            <div class="center" style="width: 100%">
-                <table border="1" >
+            <div class="center" style="width: 100%" >
+                <table border="1" style="width: 100%">
                     <thead>
                         <tr>
 
@@ -94,36 +75,41 @@
                         <c:forEach var="dto" items="${seachResult}" varStatus="counter">
                         <form>
                             <tr>
-                                <td>
+                                <td style="text-align:center">
                                     ${counter.count}
                                 </td>
-                                <td>
+                                <td style="text-align:center">
                                     ${dto.tourName}
 
 
                                 </td>
-                                <td>
+                                <td style="text-align:center">
                                     ${dto.fromDate}
                                 </td>
-                                <td>
+                                <td style="text-align:center">
                                     ${dto.toDate}
 
                                 </td>
 
-                                <td>
-                                    ${dto.price}
+                                <td style="text-align:center">
+                                    ${dto.price} $
                                 </td>
 
-                                <td>
+                                <td style="text-align:center">
                                     ${dto.quota}
                                 </td>
-                                <td>
-                                    ${dto.image}
+                                <td width="125px" valign="top" style="text-align:center">
+                                    <c:if test="${not empty dto.imageName}">
+                                        <img src="images/${dto.imageName}" style="display:block; width:300px; height:300px;">
+                                    </c:if>
+                                    <c:if test="${empty dto.imageName}">
+                                        <img src="images/notFound.png" style="display:block; width:300px; height:300px;">
+                                    </c:if>
                                 </td>
-                                <td>
+                                <td style="text-align:center">
                                     ${dto.fromPlace}
                                 </td>
-                                <td>
+                                <td style="text-align:center">
                                     ${dto.toPlace}
                                 </td>
 
@@ -134,10 +120,30 @@
                     </tbody>
 
 
-                </table>
+                </table> 
             </div>
 
         </c:if>
+        <br/><br/>
+        <div class="center">
+            <c:forEach begin="1" end="${totalPage}" var="i">
+                <c:url var="currentPageLink" value="search">
+
+                    <c:param name="page" value="${i}" />
+                    <c:param name="txtFromPlace" value="${param.txtFromPlace}" />
+                    <c:param name="txtToPlace" value="${param.txtToPlace}" />
+                    <c:param name="txtFromDate" value="${param.txtFromDate}" />
+                    <c:param  name="txtToDate" value="${param.txtToDate}" />
+                    <c:param name="price" value="${param.price}" />
+                    <c:param name="urlForward" value="Search_Home" />
+
+
+                </c:url>
+                <a id="${i}"  style="margin: 5px" href="${currentPageLink}">${i}</a>
+            </c:forEach>
+
+        </div>
+
         <c:if test="${empty seachResult and not empty totalPage}">
 
 
@@ -148,6 +154,25 @@
         </c:if>
 
 
+        <script type="text/javascript">
 
+            <c:if test="${empty param.txtFromDate}">
+            var date = new Date();
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+            if (month < 10)
+                month = "0" + month;
+            if (day < 10)
+                day = "0" + day;
+            var today = year + "-" + month + "-" + day;
+
+            document.getElementById('txtFromDate').value = today;
+            </c:if>
+
+
+
+
+        </script>
     </body>
 </html>

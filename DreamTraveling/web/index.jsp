@@ -12,6 +12,9 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <form method="POST" action="new" enctype="multipart/form-data">
+            Choose a file: <input type="file" name="multiPartServlet" />
+            <input type="submit" value="Upload" />
+        </form>
     </body>
 </html>

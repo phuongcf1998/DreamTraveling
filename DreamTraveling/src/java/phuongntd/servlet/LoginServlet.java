@@ -26,8 +26,8 @@ public class LoginServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(LoginServlet.class.getName());
     private final String INVALID_PAGE = "invalid.html";
-
-    private final String HOME_MEMBER = "InitCart";
+    private final String ACCESS_DENIED_PAGE = "access_denied.html";
+    private final String HOME_MEMBER = "member.jsp";
     private final String HOME_ADMIN = "admin.jsp";
 
     /**
@@ -49,26 +49,30 @@ public class LoginServlet extends HttpServlet {
         try {
             UserDAO dao = new UserDAO();
             UserDTO dto = dao.checkLogin(username, password);
+            
 
             if (dto != null) {
+                if (dto.getStatus() != 2) {
+                    switch (dto.getRole()) {
+                        case 1: {
+                            HttpSession session = request.getSession();
+                            session.setAttribute("MEMBER", dto);
+                            url = HOME_MEMBER;
+                            break;
+                        }
+                        case 2: {
+                            HttpSession session = request.getSession();
+                            session.setAttribute("ADMIN", dto);
+                            url = HOME_ADMIN;
+                            break;
+                        }
 
-                switch (dto.getRole()) {
-                    case 1: {
-                        HttpSession session = request.getSession();
-                        session.setAttribute("MEMBER", dto);
-                        url = HOME_MEMBER;
-                        break;
+                        default:
+                            url = INVALID_PAGE;
+                            break;
                     }
-                    case 2: {
-                        HttpSession session = request.getSession();
-                        session.setAttribute("ADMIN", dto);
-                        url = HOME_ADMIN;
-                        break;
-                    }
-
-                    default:
-                        url = INVALID_PAGE;
-                        break;
+                } else {
+                    url = ACCESS_DENIED_PAGE;
                 }
 
             }

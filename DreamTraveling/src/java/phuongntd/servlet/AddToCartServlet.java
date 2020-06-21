@@ -7,6 +7,7 @@ package phuongntd.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Date;
 import java.sql.SQLException;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
@@ -18,8 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import phuongntd.cart.CartObj;
+import phuongntd.order.detail.OrderDetailDAO;
 import phuongntd.tour.TourDAO;
 import phuongntd.tour.TourDTO;
+import phuongntd.utils.DateCaculator;
 
 /**
  *
@@ -46,6 +49,7 @@ public class AddToCartServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         String tourID = request.getParameter("txtTourID");
         String url = HOME_MEMBER;
+        Date currentDate = DateCaculator.getCurrentDate();
         try {
 
             HttpSession session = request.getSession();
@@ -53,11 +57,39 @@ public class AddToCartServlet extends HttpServlet {
             if (cart == null) {
                 cart = new CartObj();
             }
-            TourDAO dao = new TourDAO();
-            TourDTO dto = dao.getTourByID(tourID);
-            cart.addItemToCart(dto);
+            TourDAO tourDAO = new TourDAO();
+            TourDTO dto = tourDAO.getTourByID(tourID);
+            OrderDetailDAO orderDetailDAO = new OrderDetailDAO();
+            int totalQuota = tourDAO.getTotalQuotaInTour(tourID);
+            int totalQuotaInOrderDetail = orderDetailDAO.getTotalQuotaTourInOrderDetail(tourID);
+            int remainQuota = totalQuota - totalQuotaInOrderDetail;
 
-            session.setAttribute("CART", cart);
+            if (dto.getToDate().before(currentDate)) {
+                request.setAttribute("TOUR_EXPIRED", dto.getTourName() + "-" + dto.getTourID() + "  is expired");
+
+            }
+            if (dto.getToDate().after(currentDate)) {
+
+                if (cart.getItems() == null && remainQuota != 0) {
+                    cart.addItemToCart(dto);
+
+                    session.setAttribute("CART", cart);
+                } else if (cart.getItems() != null && remainQuota != 0) {
+                    if (cart.getItems().get(dto) == null) {
+                        cart.addItemToCart(dto);
+                        session.setAttribute("CART", cart);
+                    } else if (cart.getItems().get(dto) < remainQuota && cart.getItems().get(dto) != null) {
+                        cart.addItemToCart(dto);
+
+                        session.setAttribute("CART", cart);
+                    } else if (cart.getItems().get(dto) >= remainQuota) {
+                        request.setAttribute("TOUR_FULL", dto.getTourName() + " Tour is full");
+                    }
+
+                } else {
+                    request.setAttribute("TOUR_FULL", dto.getTourName() + " Tour is full");
+                }
+            }
 
         } catch (NamingException ex) {
             log.error("AddToCartServlet_NamingException " + ex.getMessage());

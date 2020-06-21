@@ -40,7 +40,9 @@
         <c:if test="${empty admin}">
             <c:redirect url="login.html"></c:redirect>
         </c:if>
-
+        <c:if test="${empty admin}">
+            <c:redirect url="login.html"></c:redirect>
+        </c:if>
 
 
         <c:if test="${empty errors}">
@@ -48,7 +50,7 @@
             <div class="flex-container" >
 
 
-                <form  action="createTour" method="POST">
+                <form  action="createTour" method="POST" enctype="multipart/form-data">
                     <table>
                         <tbody>
 
@@ -64,11 +66,11 @@
 
                             <tr>
                                 <td>From Date : </td>
-                                <td><input type="text" name="txtFromDate" class="datepicker" value="${param.txtFromDate}" /></td>
+                                <td><input type="date" name="txtFromDate"  value="${param.txtFromDate}" /></td>
                             </tr>
                             <tr>
                                 <td>To Date</td>
-                                <td><input type="text" name="txtToDate" class="datepicker" value="${param.txtToDate}" /></td>
+                                <td><input type="date" name="txtToDate"  value="${param.txtToDate}" /></td>
                             </tr>
 
                             <tr>
@@ -83,15 +85,15 @@
 
                             <tr>
                                 <td>Price</td>
-                                <td><input type="text" name="price" value="${param.price}" /></td>
+                                <td><input type="number" name="price" step="0.1" value="${param.price}" /></td>
                             </tr>
                             <tr>
                                 <td>Quota</td>
-                                <td><input type="text" name="quota" value="${param.quota}" /></td>
+                                <td><input type="number" name="quota" value="${param.quota}" /></td>
                             </tr>
                             <tr>
                                 <td>Image</td>
-                                <td><input type="text" name="image" value="${param.image}" /></td>
+                                <td><input type="file" name="fileImage" /></td>
                             </tr>
 
                             <tr>
@@ -117,7 +119,7 @@
             <div class="flex-container" >
 
 
-                <form  action="createTour" method="POST">
+                <form  action="createTour" method="POST" enctype="multipart/form-data">
                     <table>
                         <tbody>
 
@@ -139,7 +141,7 @@
                             <tr>
                                 <td>Tour Name : </td>
                                 <td><input type="text" name="txtTourName" value="${param.txtTourName}" /></td>
-                                 <c:if test="${not empty errors.tourNameIsEmpty}">
+                                    <c:if test="${not empty errors.tourNameIsEmpty}">
                                     <td> <font color="red">
                                         ${errors.tourNameIsEmpty}
                                         </font></td>
@@ -148,8 +150,8 @@
 
                             <tr>
                                 <td>From Date : </td>
-                                <td><input type="text" name="txtFromDate" class="datepicker" value="${param.txtFromDate}" /></td>
-                                 <c:if test="${not empty errors.fromDateIsEmpty}">
+                                <td><input type="date" name="txtFromDate"  value="${param.txtFromDate}" /></td>
+                                    <c:if test="${not empty errors.fromDateIsEmpty}">
                                     <td> <font color="red">
                                         ${errors.fromDateIsEmpty}
                                         </font></td>
@@ -157,8 +159,8 @@
                             </tr>
                             <tr>
                                 <td>To Date</td>
-                                <td><input type="text" name="txtToDate" class="datepicker" value="${param.txtToDate}" /></td>
-                                  <c:if test="${not empty errors.toDateIsEmpty}">
+                                <td><input type="date" name="txtToDate"  value="${param.txtToDate}" /></td>
+                                    <c:if test="${not empty errors.toDateIsEmpty}">
                                     <td> <font color="red">
                                         ${errors.toDateIsEmpty}
                                         </font></td>
@@ -168,7 +170,7 @@
                             <tr>
                                 <td>From Place : </td>
                                 <td><input type="text" name="txtFromPlace" value="${param.txtFromPlace}" /></td>
-                                   <c:if test="${not empty errors.fromPlaceIsEmpty}">
+                                    <c:if test="${not empty errors.fromPlaceIsEmpty}">
                                     <td> <font color="red">
                                         ${errors.fromPlaceIsEmpty}
                                         </font></td>
@@ -178,7 +180,7 @@
                             <tr>
                                 <td>To Place : </td>
                                 <td><input type="text" name="txtToPlace" value="${param.txtToPlace}" /></td>
-                                <c:if test="${not empty errors.toPlaceIsEmpty}">
+                                    <c:if test="${not empty errors.toPlaceIsEmpty}">
                                     <td> <font color="red">
                                         ${errors.toPlaceIsEmpty}
                                         </font></td>
@@ -187,13 +189,13 @@
 
                             <tr>
                                 <td>Price</td>
-                                <td><input type="text" name="price" value="${param.price}" /></td>
-                                  <c:if test="${not empty errors.priceIsEmpty}">
+                                <td><input type="number" step="0.1" name="price" value="${param.price}" /></td>
+                                    <c:if test="${not empty errors.priceIsEmpty}">
                                     <td> <font color="red">
                                         ${errors.priceIsEmpty}
                                         </font></td>
                                     </c:if>
-                                      <c:if test="${not empty errors.priceInvalid}">
+                                    <c:if test="${not empty errors.priceInvalid}">
                                     <td> <font color="red">
                                         ${errors.priceInvalid}
                                         </font></td>
@@ -201,13 +203,13 @@
                             </tr>
                             <tr>
                                 <td>Quota</td>
-                                <td><input type="text" name="quota" value="${param.quota}" /></td>
-                                 <c:if test="${not empty errors.quotaIsEmpty}">
+                                <td><input type="number" name="quota" value="${param.quota}" /></td>
+                                    <c:if test="${not empty errors.quotaIsEmpty}">
                                     <td> <font color="red">
                                         ${errors.quotaIsEmpty}
                                         </font></td>
                                     </c:if>
-                                      <c:if test="${not empty errors.quotaInvalid}">
+                                    <c:if test="${not empty errors.quotaInvalid}">
                                     <td> <font color="red">
                                         ${errors.quotaInvalid}
                                         </font></td>
@@ -215,7 +217,7 @@
                             </tr>
                             <tr>
                                 <td>Image</td>
-                                <td><input type="text" name="image" value="${param.image}" /></td>
+                                <td><input type="file" name="fileImage" /></td>
                             </tr>
 
                             <tr>
@@ -226,7 +228,7 @@
                             ${errors.tourIdIsExisted}
                             </font><br/><br/>
                         </c:if>
-                            <c:if test="${not empty errors.invalidDate}">
+                        <c:if test="${not empty errors.invalidDate}">
                             <font color="red">
                             ${errors.invalidDate}
                             </font><br/><br/>

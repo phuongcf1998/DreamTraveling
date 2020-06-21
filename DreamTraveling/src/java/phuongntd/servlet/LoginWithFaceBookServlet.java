@@ -8,12 +8,18 @@ package phuongntd.servlet;
 import com.restfb.types.User;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.log4j.Logger;
+import phuongntd.user.UserDAO;
+import phuongntd.user.UserDTO;
+import phuongntd.utils.RandomString;
 import phuongntd.utils.RestFB;
 
 /**
@@ -22,7 +28,8 @@ import phuongntd.utils.RestFB;
  */
 public class LoginWithFaceBookServlet extends HttpServlet {
 
-    private final String HOME_MEMBER = "InitCart";
+    private static Logger log = Logger.getLogger(LoginWithFaceBookServlet.class.getName());
+    private final String HOME_MEMBER = "member.jsp";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -45,12 +52,25 @@ public class LoginWithFaceBookServlet extends HttpServlet {
 
             } else {
                 String accessToken = RestFB.getToken(code);
+                String password = RandomString.generateRandomString(9);
+
                 User user = RestFB.getUserInfo(accessToken);
                 HttpSession session = request.getSession();
-                session.setAttribute("USER_FB_ID", user.getId());
-                session.setAttribute("USER_FB_NAME", user.getName());
+                UserDTO dto = new UserDTO(user.getId(), password, user.getName(), 1, 1);
+                session.setAttribute("MEMBER", dto);
+                UserDAO dao = new UserDAO();
+                boolean checkUserExist = dao.checkUserFacebookIsExist(dto.getUserID());
+                if (!checkUserExist) {
+                    dao.insertUserFaceBookWhenLogin(dto);
+                }
+
             }
 
+        } catch (NamingException ex) {
+            log.error("LoginWithFaceBookServlet_NamingException " + ex.getMessage());
+
+        } catch (SQLException ex) {
+            log.error("LoginWithFaceBookServlet_SQLException " + ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

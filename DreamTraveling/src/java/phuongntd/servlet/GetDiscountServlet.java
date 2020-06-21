@@ -15,11 +15,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import phuongntd.discount.code.DisCountCodeDTO;
 import phuongntd.discount.code.DiscountCodeDAO;
 import phuongntd.discount.code.DiscountCodeError;
 import phuongntd.discount.user.UserDiscountDAO;
+import phuongntd.discount.user.UserDiscountDTO;
 import phuongntd.utils.DateCaculator;
 
 /**
@@ -68,7 +70,7 @@ public class GetDiscountServlet extends HttpServlet {
                     }
                 }
                 UserDiscountDAO userDAO = new UserDiscountDAO();
-                boolean resultCheck = userDAO.checkCodeUsed(discountCode, userID);
+                boolean resultCheck = userDAO.checkCodeUsed(userID, discountCode);
                 if (resultCheck) {
                     errors.setCodeUsed("Code is used");
                     foundErr = true;
@@ -79,7 +81,16 @@ public class GetDiscountServlet extends HttpServlet {
                 } else {
                     double costParse = Double.parseDouble(cost);
                     double costAfterDiscount = costParse - (costParse * dto.getPercent_discount() / 100);
-                    request.setAttribute("DISCOUNT_COST", costAfterDiscount);
+                    request.setAttribute("DISCOUNT_PERCENT", dto.getPercent_discount());
+
+                    request.setAttribute("DISCOUNT_PRICE", costAfterDiscount);
+
+                    HttpSession session = request.getSession(false);
+                    if (session != null) {
+                        UserDiscountDTO userDiscountDTO = new UserDiscountDTO(userID, discountCode);
+                        session.setAttribute("USER_DISCOUNT", userDiscountDTO);
+                        
+                    }
                 }
 
             }

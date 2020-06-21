@@ -35,6 +35,10 @@ public class CartObj implements Serializable {
         return items;
     }
 
+    public boolean isEmptyItems() {
+        return items.isEmpty();
+    }
+
     public void addItemToCart(TourDTO item) {
         if (this.items == null) {
             this.items = new HashMap<>();
@@ -56,10 +60,9 @@ public class CartObj implements Serializable {
         for (TourDTO key : set) {
             if (key.getTourID().equals(id)) {
                 if (this.items.containsKey(key)) {
-                   
+
                     this.items.replace(key, count);
-                
-                    
+
                 }
 
             }
@@ -72,7 +75,7 @@ public class CartObj implements Serializable {
             return;
         }
 
-        TourDTO dto = new TourDTO(id, "", date, date, 0, 0, "", "", "", date, 1);
+        TourDTO dto = new TourDTO(id, "", date, date, 0, 0, "", "", "", "", date, 1);
         if (this.items.containsKey(dto)) {
             this.items.remove(dto);
             if (this.items.isEmpty()) {

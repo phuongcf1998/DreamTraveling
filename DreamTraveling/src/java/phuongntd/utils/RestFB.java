@@ -24,7 +24,7 @@ public class RestFB {
     public static String getToken(final String code) throws ClientProtocolException, IOException {
         String link = String.format(FaceBookConstant.FACEBOOK_LINK_GET_TOKEN, FaceBookConstant.FACEBOOK_APP_ID,
                 FaceBookConstant.FACEBOOK_APP_SECRET, FaceBookConstant.FACEBOOK_REDIRECT_URL, code);
-        String response = Request.Get(link).setHeader("Accept-Charset","utf-8").execute().returnContent().asString();
+        String response = Request.Get(link).execute().returnContent().asString();
         JsonObject jobj = new Gson().fromJson(response, JsonObject.class);
         String accessToken = jobj.get("access_token").toString().replaceAll("\"", "");
         return accessToken;

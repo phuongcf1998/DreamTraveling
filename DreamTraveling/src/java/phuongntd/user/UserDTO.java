@@ -17,15 +17,17 @@ public class UserDTO implements Serializable {
     private String password;
     private String fullName;
     private int role;
+    private int status;
 
     public UserDTO() {
     }
 
-    public UserDTO(String userID, String password, String fullName, int role) {
+    public UserDTO(String userID, String password, String fullName, int role, int status) {
         this.userID = userID;
         this.password = password;
         this.fullName = fullName;
         this.role = role;
+        this.status = status;
     }
 
     /**
@@ -83,6 +85,22 @@ public class UserDTO implements Serializable {
     public void setRole(int role) {
         this.role = role;
     }
+
+    /**
+     * @return the status
+     */
+    public int getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    
     
 
 }

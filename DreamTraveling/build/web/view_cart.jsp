@@ -23,9 +23,16 @@
         <h1>View Your Cart </h1><br/>
 
         <c:set var="cart" value="${sessionScope.CART.items}"/>
-        <c:set var="discountPrice" value="${requestScope.DISCOUNT_COST}"/>
+        <c:set var="discountPrice" value="${requestScope.DISCOUNT_PRICE}"/>
+        <c:set var="discountPercent" value="${requestScope.DISCOUNT_PERCENT}"/>
         <c:set var="errorDiscount" value="${requestScope.DISCOUNT_ERROR}"/>
+        <c:set var="updateItemError" value="${requestScope.UPDATE_ITEM_ERROR}"/>
 
+
+        <c:set var="member" value="${sessionScope.MEMBER.fullName}"/>
+        <c:if test="${empty member}">
+            <c:redirect url="login.html"></c:redirect>
+        </c:if>
 
         <c:url var="checkOutLink" value="checkOut"></c:url>
 
@@ -52,6 +59,7 @@
                 <thead>
                     <tr>
                         <th>No.</th>
+                        <th>Tour ID</th>
                         <th>Tour Name</th>
                         <th>Amount</th> 
                         <th>Price</th>
@@ -68,6 +76,9 @@
                         <tr>
                             <td>
                                 ${counter.count}
+                            </td>
+                            <td>
+                                ${entry.key.tourID}
                             </td>
                             <td>
                                 ${entry.key.tourName}
@@ -97,6 +108,7 @@
                                 <input style="width: 100%" type="submit" value="Update" name="btAction"/>
                             </td>
 
+
                         </tr>
                     </form>
 
@@ -115,6 +127,12 @@
 
         </table><br/>
         <a href="${initCart}">Add More Cart</a> <br/><br/><br/>
+
+        <c:if test="${not empty updateItemError}">
+            <font color="red"> ${updateItemError}</font><br/><br/>
+        </c:if>
+        <br/><br/>
+
 
         <form action="getDiscount" method="POST">
             <label for="discountCode">Discount code :</label>
@@ -136,14 +154,23 @@
                 </c:if>
             <input type="hidden"  name="userID" value="${sessionScope.MEMBER.userID}">
             <input type="hidden"  name="totalPrice" value="${totalPriceOrder}">
-            <input type="submit" value="Get discount"/>
+            <c:if test="${empty discountPrice}">
+                <input type="submit" value="Get discount"/>
+            </c:if>
+            <c:if test="${not empty discountPrice}">
+
+                <script>
+                    document.write('<a id="backLink" href="' + document.referrer + '">Go back if you dont want use discount code !</a>');
+                </script>
+            </c:if>
+
         </form> <br/>
 
 
 
         <h3><font color="red">Total Price : ${totalPriceOrder} $</font></h3>
 
-        
+
         <form id="formCheckOut" action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
             <input type="hidden" name="cmd" value="_cart">
             <input type="hidden" name="return" value="${initParam['returnurl']}">
@@ -179,9 +206,14 @@
             getItemToCheckOut();
 
         }
+        document.getElementById("backLink").addEventListener('click', function () {
+        <c:remove var="CODE_DISCOUNT" scope="session" />
+
+        });
         function getItemToCheckOut() {
             var form = document.getElementById("formCheckOut");
-        <c:forEach var="entry" items="${cart}" varStatus="counter">
+        <c:if test="${empty discountPrice}">
+            <c:forEach var="entry" items="${cart}" varStatus="counter">
             var hiddenFieldName = document.createElement("input");
             hiddenFieldName.setAttribute("type", "hidden");
             hiddenFieldName.setAttribute("name", "item_name_${counter.count}");
@@ -192,20 +224,30 @@
             hiddenFieldAmount.setAttribute("name", "amount_${counter.count}");
             hiddenFieldAmount.setAttribute("value", "${entry.value*entry.key.price}");
             form.appendChild(hiddenFieldAmount);
-        </c:forEach>
-
+            </c:forEach>
+        </c:if>
         <c:if test="${not empty discountPrice}">
-            var hiddenFieldTotalAmount = document.createElement("input");
-            hiddenFieldTotalAmount.setAttribute("type", "hidden");
-            hiddenFieldTotalAmount.setAttribute("name", "amount");
-            hiddenFieldTotalAmount.setAttribute("value", "${discountPrice}");
-            form.appendChild(hiddenFieldTotalAmount);
+            <c:forEach var="entry" items="${cart}" varStatus="counter">
+            var hiddenFieldName = document.createElement("input");
+            hiddenFieldName.setAttribute("type", "hidden");
+            hiddenFieldName.setAttribute("name", "item_name_${counter.count}");
+            hiddenFieldName.setAttribute("value", "${entry.key.tourName}");
+            form.appendChild(hiddenFieldName);
+            var hiddenFieldAmount = document.createElement("input");
+            hiddenFieldAmount.setAttribute("type", "hidden");
+            hiddenFieldAmount.setAttribute("name", "amount_${counter.count}");
+
+            hiddenFieldAmount.setAttribute("value", "${entry.value*entry.key.price - (discountPercent*entry.value*entry.key.price/100)}");
+            form.appendChild(hiddenFieldAmount);
+            </c:forEach>
 
 
         </c:if>
 
 
         }
+
+
 
 
     </script>

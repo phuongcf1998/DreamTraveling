@@ -7,12 +7,18 @@ package phuongntd.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import javax.naming.NamingException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.log4j.Logger;
 import phuongntd.cart.CartObj;
+import phuongntd.order.detail.OrderDetailDAO;
+import phuongntd.tour.TourDAO;
 
 /**
  *
@@ -20,6 +26,7 @@ import phuongntd.cart.CartObj;
  */
 public class UpdateItemInCartServlet extends HttpServlet {
 
+    private static Logger log = Logger.getLogger(UpdateItemInCartServlet.class.getName());
     private final String VIEW_CART_PAGE = "view_cart.jsp";
 
     /**
@@ -47,15 +54,30 @@ public class UpdateItemInCartServlet extends HttpServlet {
 
                 CartObj cart = (CartObj) session.getAttribute("CART");
                 if (cart != null) {
+                    TourDAO tourDAO = new TourDAO();
+                    OrderDetailDAO orderDetailDAO = new OrderDetailDAO();
+                    int totalQuota = tourDAO.getTotalQuotaInTour(id);
+                    int totalQuotaInOrderDetail = orderDetailDAO.getTotalQuotaTourInOrderDetail(id);
+                    int remainQuota = totalQuota - totalQuotaInOrderDetail;
+                    if (quantity > remainQuota) {
+                        request.setAttribute("UPDATE_ITEM_ERROR", "Quota of tour remaining " + remainQuota + " slot");
 
-                    cart.updateItemToCart(id, quantity);
+                    } else {
+                        cart.updateItemToCart(id, quantity);
 
-                    session.setAttribute("CART", cart);
+                        session.setAttribute("CART", cart);
+                    }
                 }
 
             }
+        } catch (NamingException ex) {
+            log.error("UpdateItemInCartServlet_NamingException " + ex.getMessage());
+
+        } catch (SQLException ex) {
+            log.error("UpdateItemInCartServlet_SQLException " + ex.getMessage());
         } finally {
-            response.sendRedirect(url);
+            RequestDispatcher rd = request.getRequestDispatcher(url);
+            rd.forward(request, response);
             out.close();
         }
     }

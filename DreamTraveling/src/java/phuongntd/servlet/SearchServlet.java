@@ -26,9 +26,11 @@ import phuongntd.utils.CheckNumber;
  * @author Yun
  */
 public class SearchServlet extends HttpServlet {
-
+    
     private static Logger log = Logger.getLogger(SearchServlet.class.getName());
     private final String HOME_PAGE = "home.jsp";
+    private final String ADMIN_PAGE = "admin.jsp";
+    private final String MEMBER_PAGE = "member.jsp";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -42,7 +44,7 @@ public class SearchServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-
+        
         PrintWriter out = response.getWriter();
         String fromPlace = request.getParameter("txtFromPlace");
         String toPlace = request.getParameter("txtToPlace");
@@ -57,16 +59,30 @@ public class SearchServlet extends HttpServlet {
         }
         int pageSize = 5;
         int endPage = 0;
-        String url = HOME_PAGE;
-
+        String url = request.getParameter("urlForward");
+        switch (url) {
+            case "Search_Home":
+                url = HOME_PAGE;
+                break;
+            case "Search_Admin":
+                url = ADMIN_PAGE;
+                break;
+            case "Search_Member":
+                url = MEMBER_PAGE;
+                
+                break;
+        }
+        
         try {
+           
+            
             if (!price.equals("") && CheckNumber.isNumeric(price)) {
                 double priceParse = Double.parseDouble(price);
                 TourDAO dao = new TourDAO();
                 int countListTour = dao.countTourHavePriceValue(fromDateParse, toDateParse, fromPlace, toPlace, priceParse);
-
+                
                 endPage = countListTour / pageSize;
-
+                
                 if (countListTour % pageSize != 0) {
                     endPage++;
                 }
@@ -75,12 +91,12 @@ public class SearchServlet extends HttpServlet {
                 request.setAttribute("SEARCH_RESULT", listTour);
                 request.setAttribute("TOTAL_PAGE", endPage);
             } else if (price.equals("")) {
-
+                
                 TourDAO dao = new TourDAO();
                 int countListTour = dao.countTourWithoutPriceValue(fromDateParse, toDateParse, fromPlace, toPlace);
-
+                
                 endPage = countListTour / pageSize;
-
+                
                 if (countListTour % pageSize != 0) {
                     endPage++;
                 }
@@ -92,17 +108,17 @@ public class SearchServlet extends HttpServlet {
                 request.setAttribute("SEARCH_RESULT", "");
                 request.setAttribute("TOTAL_PAGE", 0);
             }
-
+            
         } catch (NamingException ex) {
             log.error("SearchServlet_NamingException " + ex.getMessage());
-
+            
         } catch (SQLException ex) {
             log.error("SearchServlet_SQLException " + ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);
             out.close();
-
+            
         }
     }
 

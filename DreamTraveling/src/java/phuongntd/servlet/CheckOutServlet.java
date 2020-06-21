@@ -17,7 +17,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import phuongntd.cart.CartObj;
+import phuongntd.discount.user.UserDiscountDAO;
+import phuongntd.discount.user.UserDiscountDTO;
 import phuongntd.order.OrderDAO;
+import phuongntd.order.detail.OrderDetailDAO;
 import phuongntd.user.UserDTO;
 import phuongntd.utils.DateCaculator;
 import phuongntd.utils.RandomString;
@@ -55,11 +58,31 @@ public class CheckOutServlet extends HttpServlet {
 
                 CartObj cart = (CartObj) session.getAttribute("CART");
                 if (cart != null) {
+
                     UserDTO user = (UserDTO) session.getAttribute("MEMBER");
                     String userID = user.getUserID();
+
                     OrderDAO dao = new OrderDAO();
                     String orderID = RandomString.generateRandomString(6);
+
+                    if (session.getAttribute("USER_DISCOUNT") != null) {
+                        UserDiscountDTO dto = (UserDiscountDTO) session.getAttribute("USER_DISCOUNT");
+                        String discountCode = dto.getDiscountCode();
+                       
+                        UserDiscountDAO userDiscountDAO = new UserDiscountDAO();
+                        userDiscountDAO.insertCodeDiscountByUser(userID, discountCode);
+                    }
                     boolean saveOrderResult = dao.checkOutOrder(orderID, userID, totalCostParse, currentDate);
+                    if (saveOrderResult) {
+                        OrderDetailDAO detailDAO = new OrderDetailDAO();
+                        boolean saveOrderDetailResult = detailDAO.insertOrderDetail(cart.getItems(), orderID);
+
+                        if (saveOrderDetailResult) {
+
+                            session.removeAttribute("CART");
+                            session.getAttribute("USER_DISCOUNT");
+                        }
+                    }
                 }
 
             }

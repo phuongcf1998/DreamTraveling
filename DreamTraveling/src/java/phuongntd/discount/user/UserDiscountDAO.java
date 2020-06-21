@@ -7,12 +7,10 @@ package phuongntd.discount.user;
 
 import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.naming.NamingException;
-import phuongntd.discount.code.DisCountCodeDTO;
 import phuongntd.utils.DBUtils;
 
 /**
@@ -21,7 +19,7 @@ import phuongntd.utils.DBUtils;
  */
 public class UserDiscountDAO implements Serializable {
 
-    public boolean checkCodeUsed(String code, String userID) throws SQLException, NamingException {
+    public boolean checkCodeUsed(String userID, String code) throws SQLException, NamingException {
 
         boolean result = false;
 
@@ -33,10 +31,10 @@ public class UserDiscountDAO implements Serializable {
             conn = DBUtils.makeConnection();
 
             if (conn != null) {
-                String sql = "Select userID from tbl_UserDiscount where discountCode = ?  ";
+                String sql = "Select userID from tbl_UserDiscount where userID = ?  and discountCode = ? ";
                 stm = conn.prepareStatement(sql);
-                stm.setString(1, code);
-
+                stm.setString(1, userID);
+                stm.setString(2, code);
                 rs = stm.executeQuery();
                 if (rs.next()) {
                     result = true;
@@ -48,6 +46,44 @@ public class UserDiscountDAO implements Serializable {
             if (rs != null) {
                 rs.close();
             }
+
+            if (stm != null) {
+                stm.close();
+            }
+
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+
+        return result;
+
+    }
+
+    public boolean insertCodeDiscountByUser(String userID, String code) throws SQLException, NamingException {
+
+        boolean result = false;
+
+        Connection conn = null;
+        PreparedStatement stm = null;
+
+        try {
+            conn = DBUtils.makeConnection();
+
+            if (conn != null) {
+                String sql = "INSERT INTO tbl_UserDiscount(userID,discountCode) VALUES (?,?)";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, userID);
+                stm.setString(2, code);
+                int row = stm.executeUpdate();
+                if (row > 0) {
+                    result = true;
+                }
+
+            }
+
+        } finally {
 
             if (stm != null) {
                 stm.close();

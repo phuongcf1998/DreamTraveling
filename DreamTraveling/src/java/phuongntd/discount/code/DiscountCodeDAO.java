@@ -12,7 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.naming.NamingException;
-import phuongntd.user.UserDTO;
 import phuongntd.utils.DBUtils;
 
 /**

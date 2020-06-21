@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/TravelingSite">
+<Context path="/TravelingSite" allowCasualMultipartParsing="true">
     <Resource name="TravelingSite" type="javax.sql.DataSource" auth="Container"
               driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver" 
-              url="jdbc:sqlserver://localhost:1433;databaseName=TravelingStie;instanceName=SQLEXPRESS"
+              url="jdbc:sqlserver://localhost:1433;databaseName=TravelingSite;instanceName=SQLEXPRESS"
               username="sa" password="phuongvip98"/>
     
     

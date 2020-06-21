@@ -5,30 +5,32 @@
  */
 package phuongntd.servlet;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.Part;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import phuongntd.tour.TourCreateError;
 import phuongntd.tour.TourDAO;
-import phuongntd.utils.CheckNumber;
+import static phuongntd.utils.ExtractFileName.extractFileName;
 
 /**
  *
  * @author Yun
  */
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2,
+        maxFileSize = 1024 * 1024 * 10, maxRequestSize = 1024 * 1024 * 50)
 public class CreateTourServlet extends HttpServlet {
 
-   private static Logger log = Logger.getLogger(CreateTourServlet.class.getName());
+    private static Logger log = Logger.getLogger(CreateTourServlet.class.getName());
     private final String CREATE_ERROR_PAGE = "create_tour.jsp";
     private final String SUCCESS_PAGE = "create_tour_success.html";
 
@@ -53,7 +55,7 @@ public class CreateTourServlet extends HttpServlet {
         String toPlace = request.getParameter("txtToPlace");
         String price = request.getParameter("price");
         String quota = request.getParameter("quota");
-        String image = request.getParameter("image");
+
         String url = CREATE_ERROR_PAGE;
 
         TourCreateError errors = new TourCreateError();
@@ -83,9 +85,9 @@ public class CreateTourServlet extends HttpServlet {
             }
 
             if (!fromDate.equals("") && !toDate.equals("")) {
-                Date date1 = new Date(fromDate);
-                Date date2 = new Date(toDate);
-                if (date1.after(date2)||date2.before(date1)) {
+                java.sql.Date date1 = java.sql.Date.valueOf(fromDate);
+                java.sql.Date date2 = java.sql.Date.valueOf(toDate);
+                if (date1.after(date2) || date2.before(date1)) {
                     foundErr = true;
                     errors.setInvalidDate("To date and From Date is not valid");
                 }
@@ -104,18 +106,9 @@ public class CreateTourServlet extends HttpServlet {
                 errors.setPriceIsEmpty("Price is empty");
             }
 
-            if (!CheckNumber.isNumeric(price) && !price.equals("")) {
-                foundErr = true;
-                errors.setPriceInvalid("Price must be number");
-            }
             if (quota.equals("")) {
                 foundErr = true;
                 errors.setQuotaIsEmpty("Quota is empty");
-            }
-
-            if (!CheckNumber.isNumeric(quota) && !quota.equals("")) {
-                foundErr = true;
-                errors.setQuotaInvalid("Quota must be number");
             }
 
             if (foundErr) {
@@ -123,16 +116,27 @@ public class CreateTourServlet extends HttpServlet {
 
             } else {
                 TourDAO dao = new TourDAO();
-                java.util.Date utilFromDate = new SimpleDateFormat("MM/dd/yyyy").parse(fromDate);
-                java.sql.Date sqlFromDate = new java.sql.Date(utilFromDate.getTime());
-                java.util.Date utilToDate = new SimpleDateFormat("MM/dd/yyyy").parse(toDate);
-                java.sql.Date sqlToDate = new java.sql.Date(utilToDate.getTime());
+                java.sql.Date sqlFromDate = java.sql.Date.valueOf(fromDate);
+                java.sql.Date sqlToDate = java.sql.Date.valueOf(toDate);
                 Double priceParse = Double.parseDouble(price);
-                int quotaParse = Integer.parseInt(quota);;
+                int quotaParse = Integer.parseInt(quota);
+                Part partImage = request.getPart("fileImage");
+                String fileImageName = extractFileName(partImage);
+                if (!fileImageName.equals("")) {
 
-                boolean result = dao.createTour(tourID, tourName, sqlFromDate, sqlToDate, priceParse, quotaParse, image, fromPlace, toPlace);
-                if (result) {
-                    url = SUCCESS_PAGE;
+                    String savePath = "C:\\Users\\Yun\\Documents\\NetBeansProjects\\DreamTraveling\\web\\images\\" + File.separator + fileImageName;
+                    partImage.write(savePath + File.separator);
+                    boolean result = dao.createTour(tourID, tourName, sqlFromDate, sqlToDate, priceParse, quotaParse, fileImageName, savePath, fromPlace, toPlace);
+
+                    if (result) {
+                        url = SUCCESS_PAGE;
+                    }
+                } else {
+                    boolean result = dao.createTour(tourID, tourName, sqlFromDate, sqlToDate, priceParse, quotaParse, "", "", fromPlace, toPlace);
+
+                    if (result) {
+                        url = SUCCESS_PAGE;
+                    }
                 }
             }
 
@@ -146,8 +150,6 @@ public class CreateTourServlet extends HttpServlet {
         } catch (NamingException ex) {
             log.error("CreateTourServlet_NamingException " + ex.getMessage());
 
-        } catch (ParseException ex) {
-            log.error("CreateTourServlet_ParseException " + ex.getMessage());
         } finally {
 
             RequestDispatcher rd = request.getRequestDispatcher(url);
